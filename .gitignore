@@ -7,4 +7,4 @@ allure-results/
 *.log
 testya/
 fixtures/
-utils/
+utils/.DS_Store
