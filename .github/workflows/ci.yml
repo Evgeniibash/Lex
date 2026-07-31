@@ -1,4 +1,4 @@
-(name: CI
+name: CI
 
 on:
   push:
@@ -52,4 +52,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/test_all.py -v --maxfail=1)
+          pytest tests/test_all.py -v --maxfail=1
