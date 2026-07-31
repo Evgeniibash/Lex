@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>QA Practice Portal</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; background: #f4f5f7; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .error { color: #d32f2f; display: none; font-size: 14px; margin-top: 5px; }
+    .success { color: #2e7d32; display: none; font-size: 14px; margin-top: 5px; }
+    ul { list-style: none; padding: 0; }
+    li { background: #f0f0f0; padding: 10px; margin-bottom: 5px; border-radius: 4px; display: flex; justify-content: space-between; }
+    .hidden { display: none; }
+    button { cursor: pointer; padding: 8px 16px; border-radius: 4px; border: none; background: #0066cc; color: white; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: calc(100% - 20px); margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>QA Practice Sandbox</h1>
+
+  <!-- Секция 1: Авторизация -->
+  <div class="card" id="login-section">
+    <h2>1. Вход в систему</h2>
+    <input type="text" id="username" placeholder="Имя пользователя (мин. 3 символа)" />
+    <input type="password" id="password" placeholder="Пароль (admin123)" />
+    <button id="login-btn" disabled>Войти</button>
+    <div id="login-error" class="error">Неверный логин или пароль!</div>
+    <div id="login-success" class="success">Успешный вход!</div>
+  </div>
+
+  <!-- Секция 2: Работа со списком задач -->
+  <div class="card" id="todo-section">
+    <h2>2. Список задач</h2>
+    <input type="text" id="todo-input" placeholder="Новая задача..." />
+    <button id="add-todo-btn">Добавить</button>
+    <ul id="todo-list">
+      <li><span>Купить кофе</span><button class="delete-btn" data-id="1">Удалить</button></li>
+      <li><span>Написать автотест</span><button class="delete-btn" data-id="2">Удалить</button></li>
+    </ul>
+  </div>
+
+  <!-- Секция 3: Задержка и Модалка -->
+  <div class="card" id="async-section">
+    <h2>3. Асинхронное действие</h2>
+    <button id="delay-btn">Загрузить данные (3 сек)</button>
+    <p id="delay-status" class="hidden">Загрузка...</p>
+    <div id="modal" class="hidden" style="border: 1px solid #ccc; padding: 10px; margin-top: 10px; background: #e8f0fe;">
+      🎉 Данные успешно загружены!
+    </div>
+  </div>
+
+  <script>
+    // Валидация логина
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+    const loginSuccess = document.getElementById('login-success');
+
+    function checkLoginForm() {
+      loginBtn.disabled = !(usernameInput.value.trim().length >= 3 && passwordInput.value.trim().length > 0);
+    }
+
+    usernameInput.addEventListener('input', checkLoginForm);
+    passwordInput.addEventListener('input', checkLoginForm);
+
+    loginBtn.addEventListener('click', () => {
+      loginError.style.display = 'none';
+      loginSuccess.style.display = 'none';
+      
+      if (usernameInput.value === 'admin' && passwordInput.value === 'admin123') {
+        loginSuccess.style.display = 'block';
+      } else {
+        loginError.style.display = 'block';
+      }
+    });
+
+    // Работа со списком
+    const todoInput = document.getElementById('todo-input');
+    const addTodoBtn = document.getElementById('add-todo-btn');
+    const todoList = document.getElementById('todo-list');
+
+    addTodoBtn.addEventListener('click', () => {
+      const text = todoInput.value.trim();
+      if (!text) return;
+
+      const li = document.createElement('li');
+      li.innerHTML = `<span>${text}</span><button class="delete-btn">Удалить</button>`;
+      todoList.appendChild(li);
+      todoInput.value = '';
+    });
+
+    todoList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        e.target.parentElement.remove();
+      }
+    });
+
+    // Асинхронная задержка
+    const delayBtn = document.getElementById('delay-btn');
+    const delayStatus = document.getElementById('delay-status');
+    const modal = document.getElementById('modal');
+
+    delayBtn.addEventListener('click', () => {
+      delayBtn.disabled = true;
+      delayStatus.classList.remove('hidden');
+      modal.classList.add('hidden');
+
+      setTimeout(() => {
+        delayStatus.classList.add('hidden');
+        modal.classList.remove('hidden');
+        delayBtn.disabled = false;
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
