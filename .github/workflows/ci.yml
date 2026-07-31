@@ -19,24 +19,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Chrome and ChromeDriver
+      - name: Remove old ChromeDriver and install correct version
         run: |
-          # Установка Chrome
+          # Удаляем старый ChromeDriver
+          sudo rm -f /usr/bin/chromedriver
+          sudo rm -f /usr/local/bin/chromedriver
+          
+          # Устанавливаем Chrome
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
           sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
           
-          # Установка ChromeDriver через webdriver-manager
-          sudo apt-get install -y npm
-          sudo npm install -g webdriver-manager
-          sudo webdriver-manager update --versions.chrome=latest
+          # Устанавливаем ChromeDriver через webdriver-manager (без npm)
+          pip install webdriver-manager
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install selenium pytest webdriver-manager
+          pip install selenium pytest
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3

@@ -1,28 +1,25 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+import os
 
 @pytest.fixture(scope="function")
 def driver():
-    """Фикстура: открывает и закрывает браузер для каждого теста"""
     options = Options()
     
-    # ---- НАСТРОЙКИ, ЧТОБЫ НЕ БЕСИЛО ОКНО ВХОДА В GOOGLE ----
-    options.add_argument("--no-first-run")                           # не показывать приветствие
-    options.add_argument("--disable-blink-features=AutomationControlled")  # скрыть автоматизацию
-    options.add_argument("--disable-infobars")                       # убрать плашку "Управляется автоматизированным ПО"
-    options.add_argument("--disable-notifications")                  # отключить уведомления браузера
+    # Если запускаем в CI (GitHub Actions)
+    if os.getenv('CI'):
+        options.add_argument('--headless=new')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
     
-    # Убираем флаг автоматизации (чтобы Chrome не палился)
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option('useAutomationExtension', False)
-    
-    # Запускаем браузер
-    driver = webdriver.Chrome(options=options)
+    # Автоматически скачиваем правильную версию ChromeDriver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
     driver.maximize_window()
-    
-    # Дополнительно: удаляем следы автоматизации через JavaScript
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-    
     yield driver
     driver.quit()
